@@ -61,6 +61,8 @@ class Bank extends EventEmitter {
 
 const bank = new Bank();
 
+// added some users for testing
+
 const personId: number = bank.register({
   name: 'Джон Доу',
   balance: 150
