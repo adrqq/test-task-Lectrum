@@ -1,6 +1,11 @@
 // Для запуска файла использовать команду ts-node src/index.ts находясь в папке homeworks/2
 import { EventEmitter } from './emitter';
-import { Person, Persons, Events, TranscationData, UserData } from './types';
+import { Person,
+  Persons, 
+  Events, 
+  TranscationData, 
+  UserData 
+} from './types';
 
 class Bank extends EventEmitter {
   persons: Persons = {};

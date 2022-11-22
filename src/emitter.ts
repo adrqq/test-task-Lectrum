@@ -4,7 +4,6 @@ import {
   Person,
   EventsMap,
   UserData,
-  TranscationData,
 } from './types';
 
 export class EventEmitter {
