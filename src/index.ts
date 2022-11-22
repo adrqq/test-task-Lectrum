@@ -37,7 +37,7 @@ class Bank extends EventEmitter {
     this.emit<UserData>(Events.changeBalance, { name: person.name, amount: person.balance });
   }
 
-  withdraw(data: TranscationData): void {
+  private withdraw(data: TranscationData): void {
     const { personId, amount } = data;
     const person: Person = this.persons[personId];
 
