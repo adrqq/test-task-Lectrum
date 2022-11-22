@@ -1,33 +1,42 @@
+import {
+  Events,
+  Handler,
+  Person,
+  EventsMap,
+  UserData,
+  TranscationData,
+} from './types';
+
 export class EventEmitter {
-    events = Object.create(null);
+  events: EventsMap = Object.create(null);
 
-    constructor() {
-        this
-            .on('register', (person: any) => {
-            console.log(`Пользователь ${person.name} был успешно зарегистрирован`);
-            })
-            .on('changeBalance', ({ name, amount }: any) => {
-                console.log(`На счету ${name} — ${amount}$`);
-            });
+  constructor() {
+    this
+      .on<Person>(Events.register, (person: Person) => {
+        console.log(`Пользователь ${person.name} был успешно зарегистрирован`);
+      })
+      .on<UserData>(Events.changeBalance, ({ name, amount }: UserData) => {
+        console.log(`На счету ${name} — ${amount}$`);
+      });
+  }
+
+  on<T>(type: Events, handler: Handler<T>): EventEmitter {
+    if (type in this.events) {
+      this.events[type]?.push(handler);
+    } else {
+      this.events[type] = [handler];
     }
 
-    on (type: any, handler: any) {
-        if (type in this.events) {
-            this.events[type].push(handler);
-        } else {
-            this.events[type] = [handler];
-        }
+    return this;
+  }
 
-        return this;
+  emit<T>(type: Events, data: T): EventEmitter {
+    const handlers = this.events[type];
+
+    if (Array.isArray(handlers)) {
+      handlers.forEach((handler) => handler(data));
     }
 
-    emit(type: any, data: any) {
-        const handlers = this.events[type];
-
-        if (Array.isArray(handlers)) {
-            handlers.forEach((handler) => handler(data));
-        }
-
-        return this;
-    }
+    return this;
+  }
 }

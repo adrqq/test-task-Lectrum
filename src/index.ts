@@ -1,45 +1,77 @@
 // Для запуска файла использовать команду ts-node src/index.ts находясь в папке homeworks/2
 import { EventEmitter } from './emitter';
+import { Person, Persons, Events, TranscationData, UserData } from './types';
 
 class Bank extends EventEmitter {
-    persons: any = {};
+  persons: Persons = {};
 
-    constructor() {
-        super();
-        this.on('add', (data: any) => this.add(data));
+  constructor() {
+    super();
+    this.on(Events.add, (data: any) => this.add(data));
+    this.on(Events.withdraw, (data: any) => this.withdraw(data));
+  }
+
+  register(person: Person): number {
+    const id = Date.now();
+
+    this.persons[id] = { ...person };
+    this.emit(Events.register, person);
+
+    return id;
+  }
+
+  private add(data: TranscationData): void {
+    const { personId, amount } = data;
+    const person: Person = this.persons[personId];
+
+    if (!person) {
+      throw new Error(`Пользователь с идентификатором ${personId} не найден`);
     }
 
-    register (person: any) {
-        const id = Date.now();
-
-        this.persons[id] = { ...person };
-        this.emit('register', person);
-
-        return id;
+    if (amount < 0) {
+      throw new Error(`Сумма должна быть положительной`);
     }
 
-    add (data: any) {
-        const { personId, amount } = data;
-        const person = this.persons[personId];
+    person.balance = person.balance + amount;
 
-        if (!person) {
-            throw new Error(`Пользователь с идентификатором ${personId} не найден`);
-        }
+    this.emit<UserData>(Events.changeBalance, { name: person.name, amount: person.balance });
+  }
 
-        person.balance = person.balance + amount;
+  withdraw(data: TranscationData): void {
+    const { personId, amount } = data;
+    const person: Person = this.persons[personId];
 
-        this.emit('changeBalance', { name: person.name, amount: person.balance});
+    if (!person) {
+      throw new Error(`Пользователь с идентификатором ${personId} не найден`);
     }
+
+    if (amount < 0) {
+      throw new Error(`Сумма должна быть положительной`);
+    }
+
+    if (person.balance - amount <= 0) {
+      throw new Error(`Недостаточно средств на счету пользователя ${person.name}`);
+    } else {
+      person.balance = person.balance - amount;
+    }
+
+    this.emit<UserData>(Events.changeBalance, { name: person.name, amount: person.balance });
+  }
 }
 
 const bank = new Bank();
 
-const personId = bank.register({
-    name: 'Джон Доу',
-    balance: 100
+const personId: number = bank.register({
+  name: 'Джон Доу',
+  balance: 100
 });
 
-bank.emit('add', { personId, amount: 20 });
+bank.emit<TranscationData>(Events.add, { personId, amount: 40 });
 
 // Задание со звёздочкой
-bank.emit('withdraw', { personId, amount: 20 });
+bank.emit<TranscationData>(Events.withdraw, { personId, amount: 70 });
+
+
+
+
+
