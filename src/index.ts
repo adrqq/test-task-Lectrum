@@ -63,13 +63,24 @@ const bank = new Bank();
 
 const personId: number = bank.register({
   name: 'Джон Доу',
-  balance: 100
+  balance: 150
 });
 
-bank.emit<TranscationData>(Events.add, { personId, amount: 40 });
+bank.emit<TranscationData>(Events.add, { personId: personId, amount: 40 });
 
 // Задание со звёздочкой
-bank.emit<TranscationData>(Events.withdraw, { personId, amount: 70 });
+bank.emit<TranscationData>(Events.withdraw, { personId: personId, amount: 70 });
+
+const person2Id: number = bank.register({
+  name: 'Джон Cноу',
+  balance: 1000
+});
+
+bank.emit<TranscationData>(Events.add, { personId: person2Id, amount: 150 });
+
+bank.emit<TranscationData>(Events.withdraw, { personId: person2Id, amount: 1000 });
+
+console.log(bank.persons);
 
 
 
